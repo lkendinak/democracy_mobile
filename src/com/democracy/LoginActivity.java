@@ -17,7 +17,9 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -36,12 +38,16 @@ public class LoginActivity extends AppCompatActivity {
 	private EditText emailEditText, passwordEditText;
 
 	private Button loginButton;
+	
+	private Context mContext;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_login);
+		
+		mContext = getApplicationContext();
 
 		emailEditText = (EditText) findViewById(R.id.email_field);
 
@@ -72,24 +78,33 @@ public class LoginActivity extends AppCompatActivity {
 
 		@Override
 		protected ResponseDTO doInBackground(String... params) {
-			
+
 			String response = postData(params[0], params[1]);
 			Gson gson = new Gson();
-			ResponseDTO responseDTO = gson.fromJson(response, ResponseDTO.class);
+			ResponseDTO responseDTO = gson
+					.fromJson(response, ResponseDTO.class);
 			return responseDTO;
 		}
 
 		protected void onPostExecute(ResponseDTO result) {
-			
-			if(result.getSuccess().equals("true")) {
+
+			if (result.getSuccess().equals("true")) {
+
+				SharedPreferences prefs = mContext
+						.getSharedPreferences("com.democracy",
+								Context.MODE_PRIVATE);
+				prefs.edit().putString(Constants.TOKEN_SP_KEY,
+						result.getMessage()).commit();
+
 				Intent i = new Intent(getApplicationContext(),
 						MainActivity.class);
 				startActivity(i);
+
 			} else {
 				Toast.makeText(getApplicationContext(), result.getMessage(),
 						Toast.LENGTH_LONG).show();
 			}
-			
+
 		}
 
 		protected void onProgressUpdate(Integer... progress) {
@@ -114,12 +129,12 @@ public class LoginActivity extends AppCompatActivity {
 				HttpResponse response = httpclient.execute(httppost);
 
 				HttpEntity entity = response.getEntity();
-				
+
 				InputStream is = entity.getContent();
 				String responseStr = convertStreamToString(is);
-				
+
 				return responseStr;
-                
+
 			} catch (ClientProtocolException e) {
 				Toast.makeText(getApplicationContext(), "Algum erro ocorreu.",
 						Toast.LENGTH_LONG).show();
@@ -132,27 +147,27 @@ public class LoginActivity extends AppCompatActivity {
 		}
 
 	}
-	
+
 	private static String convertStreamToString(InputStream is) {
 
-	    BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-	    StringBuilder sb = new StringBuilder();
+		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+		StringBuilder sb = new StringBuilder();
 
-	    String line = null;
-	    try {
-	        while ((line = reader.readLine()) != null) {
-	            sb.append((line + "\n"));
-	        }
-	    } catch (IOException e) {
-	        e.printStackTrace();
-	    } finally {
-	        try {
-	            is.close();
-	        } catch (IOException e) {
-	            e.printStackTrace();
-	        }
-	    }
-	    return sb.toString();
+		String line = null;
+		try {
+			while ((line = reader.readLine()) != null) {
+				sb.append((line + "\n"));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				is.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return sb.toString();
 	}
 
 }
