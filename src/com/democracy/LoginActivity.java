@@ -1,9 +1,7 @@
 package com.democracy;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +27,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.democracy.dto.ResponseDTO;
+import com.democracy.helper.ConnectionHelper;
 import com.democracy.helper.Constants;
 import com.google.gson.Gson;
 
@@ -131,7 +130,7 @@ public class LoginActivity extends AppCompatActivity {
 				HttpEntity entity = response.getEntity();
 
 				InputStream is = entity.getContent();
-				String responseStr = convertStreamToString(is);
+				String responseStr = ConnectionHelper.convertStreamToString(is);
 
 				return responseStr;
 
@@ -146,28 +145,6 @@ public class LoginActivity extends AppCompatActivity {
 			return null;
 		}
 
-	}
-
-	private static String convertStreamToString(InputStream is) {
-
-		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-		StringBuilder sb = new StringBuilder();
-
-		String line = null;
-		try {
-			while ((line = reader.readLine()) != null) {
-				sb.append((line + "\n"));
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				is.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		return sb.toString();
 	}
 
 }
