@@ -130,7 +130,7 @@ public class LoginActivity extends AppCompatActivity {
 				HttpEntity entity = response.getEntity();
 
 				InputStream is = entity.getContent();
-				String responseStr = ConnectionHelper.convertStreamToString(is);
+				String responseStr = ConnectionHelper.convertInputStreamToString(is);
 
 				return responseStr;
 

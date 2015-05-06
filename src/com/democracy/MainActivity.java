@@ -1,19 +1,23 @@
 package com.democracy;
 
-import java.io.BufferedReader;
+import java.io.BufferedInputStream;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.util.List;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
 
+import com.democracy.dto.QuestionAvailableOutputDTO;
 import com.democracy.helper.ConnectionHelper;
+import com.democracy.helper.Constants;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -25,6 +29,10 @@ public class MainActivity extends AppCompatActivity {
 		setContentView(R.layout.activity_main);
 		
 		this.mContext = getApplicationContext();
+		
+		new GetAvailableQuestionsTask(getApplicationContext())
+				.execute(Constants.SERVER_URL
+						+ Constants.URL_GET_AVAILABLE_QUESTIONS);
 	}
 
 	@Override
@@ -48,12 +56,10 @@ public class MainActivity extends AppCompatActivity {
 
 	class GetAvailableQuestionsTask extends AsyncTask<String, String, String> {
 
-		private TextView dataField;
 		private Context context;
 
-		public GetAvailableQuestionsTask(Context context, TextView dataField) {
+		public GetAvailableQuestionsTask(Context context) {
 			this.context = context;
-			this.dataField = dataField;
 		}
 
 		protected void onPreExecute() {
@@ -62,22 +68,33 @@ public class MainActivity extends AppCompatActivity {
 
 		@Override
 		protected String doInBackground(String... arg0) {
+			
+			InputStream inputStream = null;
+			String result = null;
 			try {
-				String url = (String) arg0[0];
+				String url = arg0[0];
 
+				SharedPreferences prefs = context
+						.getSharedPreferences("com.democracy",
+								Context.MODE_PRIVATE);
+				String token = prefs.getString(Constants.TOKEN_SP_KEY, null);
+				
+				url = url.replace("<TOKEN>", token);
+				
 				HttpURLConnection conn = ConnectionHelper.getConnection(url,
 						"GET");
-				conn.connect();
+				
+				int statusCode = conn.getResponseCode();
 
-				InputStream is = conn.getInputStream();
-				BufferedReader reader = new BufferedReader(
-						new InputStreamReader(is, "UTF-8"));
-				String data = null;
-				String webPage = "";
-				while ((data = reader.readLine()) != null) {
-					webPage += data + "\n";
-				}
-				return webPage;
+                /* 200 represents HTTP OK */
+                if (statusCode ==  200) {
+                    inputStream = new BufferedInputStream(conn.getInputStream());
+                    result = ConnectionHelper.convertInputStreamToString(inputStream);
+                }else{
+                    result = null; //"Failed to fetch data!";
+                }
+
+				return result;
 			} catch (Exception e) {
 				return new String("Exception: " + e.getMessage());
 			}
@@ -85,7 +102,12 @@ public class MainActivity extends AppCompatActivity {
 
 		@Override
 		protected void onPostExecute(String result) {
-			this.dataField.setText(result);
+			Gson gson = new Gson();
+			List<QuestionAvailableOutputDTO> questions = gson.fromJson(result,
+					new TypeToken<List<QuestionAvailableOutputDTO>>() {
+					}.getType());
+			System.out.println("ople");
+			// create adapter
 		}
 
 	}

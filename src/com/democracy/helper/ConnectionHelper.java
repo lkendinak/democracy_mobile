@@ -19,34 +19,29 @@ public class ConnectionHelper {
 
 		URL url = new URL(urlStr);
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-		conn.setReadTimeout(10000);
-		conn.setConnectTimeout(15000);
+		conn.setRequestProperty("Content-Type", "application/json");
+		conn.setRequestProperty("Accept", "application/json");
 		conn.setRequestMethod(method);
 		conn.setDoInput(true);
 
 		return conn;
 	}
 
-	public static String convertStreamToString(InputStream is) {
-
-		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-		StringBuilder sb = new StringBuilder();
-
-		String line = null;
-		try {
-			while ((line = reader.readLine()) != null) {
-				sb.append((line + "\n"));
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				is.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+	public static String convertInputStreamToString(InputStream inputStream)
+			throws IOException {
+		BufferedReader bufferedReader = new BufferedReader(
+				new InputStreamReader(inputStream));
+		String line = "";
+		String result = "";
+		while ((line = bufferedReader.readLine()) != null) {
+			result += line;
 		}
-		return sb.toString();
+
+		/* Close Stream */
+		if (null != inputStream) {
+			inputStream.close();
+		}
+		return result;
 	}
 	
 	/* Verifica conexão com a Internet. */

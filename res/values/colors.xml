@@ -13,5 +13,5 @@
     <item name="darkred" type="color">#FFCC0000</item>
     
     <item name="light_blue" type="color">#DEF5FA</item>
-    
+    <item name="main_pink" type="color">#FF4A75</item> 
 </resources>
