@@ -1,16 +1,16 @@
 package com.democracy.dto;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class QuestionAvailableOutputDTO {
 
 	private String id;
 
 	private String question;
-	
+
 	private String dateActivated;
 
-	private List<AnswerOutputDTO> answers;
+	private ArrayList<AnswerOutputDTO> answers;
 
 	private String userAnswer;
 
@@ -40,11 +40,11 @@ public class QuestionAvailableOutputDTO {
 		this.dateActivated = dateActivated;
 	}
 
-	public List<AnswerOutputDTO> getAnswers() {
+	public ArrayList<AnswerOutputDTO> getAnswers() {
 		return answers;
 	}
 
-	public void setAnswers(List<AnswerOutputDTO> answers) {
+	public void setAnswers(ArrayList<AnswerOutputDTO> answers) {
 		this.answers = answers;
 	}
 

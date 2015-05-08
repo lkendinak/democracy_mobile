@@ -11,4 +11,9 @@
     <string name="password_hint">Senha</string>
     
     <string name="login">Login</string>
+    
+    <string name="available_questions">Perguntas disponíveis</string>
+    
+    <string name="but_answer">Responder</string>
+    <string name="but_partial_result">Resultado parcial</string>
 </resources>

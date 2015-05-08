@@ -2,7 +2,7 @@ package com.democracy.helper;
 
 public class Constants {
 
-	public static final String SERVER_URL = "http://10.114.157.140:8080/democracy";
+	public static final String SERVER_URL = "http://10.0.2.2:8080/democracy";
 	
 	public static final String URL_MAKE_COMMENT = "/mobile/makeComment";
 	

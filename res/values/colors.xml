@@ -14,4 +14,5 @@
     
     <item name="light_blue" type="color">#DEF5FA</item>
     <item name="main_pink" type="color">#FF4A75</item> 
+    <item name="main_purple" type="color">#2B1E53</item> 
 </resources>
