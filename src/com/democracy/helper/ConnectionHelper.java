@@ -30,6 +30,24 @@ public class ConnectionHelper {
 
 		return conn;
 	}
+	
+	public static HttpURLConnection getConnectionPost(String urlStr, String method)
+			throws IOException {
+
+		URL url = new URL(urlStr);
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		conn.setDoOutput( true );
+		conn.setDoInput ( true );
+		conn.setInstanceFollowRedirects( false );
+		conn.setRequestMethod( "POST" );
+		conn.setRequestProperty( "Content-Type", "application/x-www-form-urlencoded"); 
+		conn.setRequestProperty( "charset", "utf-8");
+		conn.setUseCaches( false );
+		
+		conn.setDoInput(true);
+
+		return conn;
+	}
 
 	public static String convertInputStreamToString(InputStream inputStream)
 			throws IOException {
@@ -49,7 +67,7 @@ public class ConnectionHelper {
 	}
 	
 	/* Verifica conexão com a Internet. */
-	public static void checkInternetConenction(Context context) {
+	public static void checkInternetConnection(Context context) {
 		ConnectivityManager check = (ConnectivityManager) context
 				.getSystemService(Context.CONNECTIVITY_SERVICE);
 		if (check != null) {
@@ -57,8 +75,7 @@ public class ConnectionHelper {
 			if (info != null) {
 				for (int i = 0; i < info.length; i++) {
 					if (info[i].getState() == NetworkInfo.State.CONNECTED) {
-						Toast.makeText(context, "Internet is connected",
-								Toast.LENGTH_SHORT).show();
+						// is connected
 					}
 				}
 			}

@@ -1,29 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="?android:attr/listPreferredItemHeight"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
     android:orientation="vertical"
     android:padding="10dp" >
+
+    <TextView
+        android:id="@+id/questionId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/toptext"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
+        android:paddingBottom="10dp"
         android:singleLine="true"
         android:textColor="#3395D0"
-        android:textSize="13sp" />
+        android:textSize="14sp" />
 
-    <ListView
-        android:id="@+id/listview_answers"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp" >
-    </ListView>
+    <RadioGroup
+        android:id="@+id/optionRadioGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+    </RadioGroup>
 
     <Button
+        android:id="@+id/answer_but"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_weight="5.70"
         android:text="@string/but_answer" />
 
