@@ -11,12 +11,11 @@
             backward-compatibility can go here.
         -->
     </style>
-    <!-- Application theme. -->
-    <style name="AppTheme" parent="AppBaseTheme">
-        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
-    </style>
 
-    <style name="CustomActionBarTheme"
+    <style name="DemocracyTheme" parent="@style/Theme.AppCompat">
+    </style>
+    
+    <style name="DemocracyTheme.CustomActionBarTheme"
            parent="@style/Theme.AppCompat.Light.DarkActionBar">
         <item name="android:actionBarStyle">@style/MyActionBar</item>
 
