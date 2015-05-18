@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="?android:attr/listPreferredItemHeight"
     android:orientation="vertical"
     android:padding="10dp" >
 
@@ -9,34 +9,38 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="5dp" >
+        android:padding="2dp" >
 
         <TextView
+            android:id="@+id/username"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:paddingBottom="10dp"
+            android:paddingBottom="5dp"
             android:scrollHorizontally="false"
             android:singleLine="false"
-            android:text="@string/partial_results"
             android:textColor="@color/main_purple"
             android:textSize="14sp"
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/all_answers"
+            android:id="@+id/comment_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
-            android:layout_marginTop="5dp"
             android:gravity="center_vertical"
+            android:textColor="@color/main_pink"
             android:textSize="12sp" />
     </LinearLayout>
 
-    <ListView
-        android:id="@+id/listview_partial_results"
+    <TextView
+        android:id="@+id/comment"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_marginTop="5dp" />
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:textColor="@color/main_gray"
+        android:scrollHorizontally="false"
+        android:singleLine="false"
+        android:textSize="12sp" />
 
 </LinearLayout>

@@ -10,10 +10,16 @@
     
     <string name="email_hint">Email</string>
     <string name="password_hint">Senha</string>
+    <string name="new_comment_hint">Novo comentário</string>
     
     <string name="login">Login</string>
     
     <string name="available_questions">Perguntas disponíveis</string>
+    
+    <string name="comments">Comentários</string>
+    
+    <string name="but_cancel">Cancelar</string>
+    <string name="but_comment">Comentar</string>
     
     <string name="but_answer">Responder</string>
     <string name="but_partial_result">Resultado parcial</string>

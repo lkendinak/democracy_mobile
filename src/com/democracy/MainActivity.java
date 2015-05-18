@@ -6,12 +6,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -40,8 +40,10 @@ import com.democracy.helper.Constants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+@SuppressLint("InflateParams")
 public class MainActivity extends AppCompatActivity {
 
+	@SuppressWarnings("unused")
 	private Context mContext;
 
 	private ListView listview;
@@ -220,7 +222,6 @@ public class MainActivity extends AppCompatActivity {
 									.findViewById(R.id.questionId)).getText()
 									.toString();
 								
-								//Toast.makeText(context, questionId + " answerId: " + answerId, Toast.LENGTH_LONG).show();
 								AnswerQuestionsTask answerTask = new AnswerQuestionsTask(
 										context, questionId, answerId);
 								answerTask.execute();
@@ -235,8 +236,16 @@ public class MainActivity extends AppCompatActivity {
 				commentsBut.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						Toast.makeText(context, "Comments", Toast.LENGTH_SHORT).show();
-						
+						View parent = (View) v.getParent().getParent();
+						if(parent != null) {
+							// AsyncTask partial results
+							String questionId = ((TextView) parent
+									.findViewById(R.id.questionId)).getText()
+									.toString();
+							Intent i = new Intent(MainActivity.this, CommentActivity.class);
+							i.putExtra("questionId", questionId);
+		            		startActivity(i);
+						}
 					}
 				});
 				
@@ -246,7 +255,6 @@ public class MainActivity extends AppCompatActivity {
 					@Override
 					public void onClick(View v) {
 						
-						// TODO
 						View parent = (View) v.getParent().getParent();
 						if(parent != null) {
 							// AsyncTask partial results
@@ -367,91 +375,11 @@ public class MainActivity extends AppCompatActivity {
 		@Override
 		protected void onPostExecute(String result) {
 			Toast.makeText(context, "Pergunta respondida.", Toast.LENGTH_LONG).show();
-			
-			System.out.println("ople");
-			// create adapter
 		}
 
 	}
-	//
-	// class MakeCommentTask extends AsyncTask<String, String, String> {
-	//
-	// private Context context;
-	//
-	// private String questionId;
-	//
-	// private String comment;
-	//
-	// public MakeCommentTask(Context context, String questionId,
-	// String comment) {
-	// this.context = context;
-	// this.questionId = questionId;
-	// this.comment = comment;
-	// }
-	//
-	// @Override
-	// protected void onPreExecute() {
-	// ConnectionHelper.checkInternetConenction(context);
-	// }
-	//
-	// @Override
-	// protected String doInBackground(String... arg0) {
-	//
-	// InputStream inputStream = null;
-	// String result = null;
-	// try {
-	// String url = Constants.SERVER_URL + Constants.URL_MAKE_COMMENT;
-	//
-	// SharedPreferences prefs = context.getSharedPreferences(
-	// "com.democracy", Context.MODE_PRIVATE);
-	// String token = prefs.getString(Constants.TOKEN_SP_KEY, null);
-	//
-	// HashMap<String, String> postDataParams = new HashMap<String, String>();
-	// postDataParams.put("questionId", this.questionId);
-	// postDataParams.put("comment", this.comment);
-	// postDataParams.put("token", token);
-	//
-	// HttpURLConnection conn = ConnectionHelper.getConnection(url,
-	// "POST");
-	//
-	// OutputStream os = conn.getOutputStream();
-	// BufferedWriter writer = new BufferedWriter(
-	// new OutputStreamWriter(os, "UTF-8"));
-	// writer.write(ConnectionHelper.getPostDataString(postDataParams));
-	//
-	// writer.flush();
-	// writer.close();
-	// os.close();
-	//
-	// int statusCode = conn.getResponseCode();
-	//
-	// /* 200 represents HTTP OK */
-	// if (statusCode == 200) {
-	// inputStream = new BufferedInputStream(conn.getInputStream());
-	// result = ConnectionHelper
-	// .convertInputStreamToString(inputStream);
-	// } else {
-	// result = null; // "Failed to fetch data!";
-	// }
-	//
-	// return result;
-	// } catch (Exception e) {
-	// return new String("Exception: " + e.getMessage());
-	// }
-	// }
-	//
-	// @Override
-	// protected void onPostExecute(String result) {
-	// // Gson gson = new Gson();
-	// // List<QuestionAvailableOutputDTO> questions =
-	// // gson.fromJson(result,
-	// // new TypeToken<List<QuestionAvailableOutputDTO>>() {
-	// // }.getType());
-	// System.out.println("ople");
-	// // create adapter
-	// }
-	//
-	// }
+
+	
 	
 	class PartialResultsTask extends AsyncTask<String, String, String> {
 
@@ -536,7 +464,7 @@ public class MainActivity extends AppCompatActivity {
 				AppCompatDialog dialog = builder.create();
 				dialog.show();
 				
-				// Create adapter
+				// Create partial adapter
 				AnswersListAdaptor adaptor = new AnswersListAdaptor(
 						context, R.layout.dialog_partial_list_item, partialResults.getAnswers());
 				dialogListView.setAdapter(adaptor);
