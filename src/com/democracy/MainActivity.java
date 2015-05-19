@@ -27,6 +27,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -43,10 +44,11 @@ import com.google.gson.reflect.TypeToken;
 @SuppressLint("InflateParams")
 public class MainActivity extends AppCompatActivity {
 
-	@SuppressWarnings("unused")
 	private Context mContext;
 
 	private ListView listview;
+	
+	private ProgressBar spinner;
 	
 	private Integer total = -1;
 
@@ -59,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
 
 		this.listview = (ListView) this.findViewById(R.id.listview);
 
+		this.spinner = (ProgressBar) findViewById(R.id.main_progressbar);
+		
 		new GetAvailableQuestionsTask(getApplicationContext()).execute();
 	}
 
@@ -73,7 +77,14 @@ public class MainActivity extends AppCompatActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 
 		int id = item.getItemId();
-		if (id == R.id.action_settings) {
+		if (id == R.id.action_logout) {
+			SharedPreferences prefs = mContext.getSharedPreferences(
+					"com.democracy", Context.MODE_PRIVATE);
+			prefs.edit().remove(Constants.TOKEN_SP_KEY).commit();
+			
+			Intent i = new Intent(MainActivity.this, LoginActivity.class);
+    		startActivity(i);
+    		
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
@@ -143,6 +154,9 @@ public class MainActivity extends AppCompatActivity {
 								new TypeToken<ArrayList<QuestionAvailableOutputDTO>>() {
 								}.getType());
 
+				listview.setVisibility(View.VISIBLE);
+				spinner.setVisibility(View.GONE);
+				
 				// Create adapter
 				AvailableQuestionsListAdaptor adaptor = new AvailableQuestionsListAdaptor(
 						context, R.layout.question_list_item, questions);

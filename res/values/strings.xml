@@ -6,6 +6,8 @@
     <string name="action_settings">Settings</string>
 	<string name="ok">OK</string>
     
+	<string name="logout">Logout</string>
+	
     <string name="default_content">Default Image</string>
     
     <string name="email_hint">Email</string>
@@ -17,6 +19,7 @@
     <string name="available_questions">Perguntas disponíveis</string>
     
     <string name="comments">Comentários</string>
+    <string name="no_comments">Esta pergunta ainda não possui comentários.</string>
     
     <string name="but_cancel">Cancelar</string>
     <string name="but_comment">Comentar</string>

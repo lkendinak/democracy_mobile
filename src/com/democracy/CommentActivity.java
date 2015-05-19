@@ -25,6 +25,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,6 +46,9 @@ public class CommentActivity extends AppCompatActivity {
 	
 	private String questionId;
 	
+	private ProgressBar spinner;
+	
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -58,6 +62,8 @@ public class CommentActivity extends AppCompatActivity {
 		this.listView = (ListView) this.findViewById(R.id.listview_comments);
 
 		this.sendComment = (ImageButton) this.findViewById(R.id.send_comment);
+		
+		this.spinner = (ProgressBar) findViewById(R.id.comment_progressbar);
 		
 		sendComment.setOnClickListener(new View.OnClickListener() {
 			
@@ -87,7 +93,7 @@ public class CommentActivity extends AppCompatActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 
 		int id = item.getItemId();
-		if (id == R.id.action_settings) {
+		if (id == R.id.action_logout) {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
@@ -162,10 +168,18 @@ public class CommentActivity extends AppCompatActivity {
 								new TypeToken<ArrayList<CommentOutputDTO>>() {
 								}.getType());
 				
-				CommentsListAdaptor adaptor = new CommentsListAdaptor(
-						context, R.layout.dialog_comments_list_item, comments);
-				listView.setAdapter(adaptor);
+				listView.setVisibility(View.VISIBLE);
+				spinner.setVisibility(View.GONE);
 				
+				if(comments.size() > 0) {
+					CommentsListAdaptor adaptor = new CommentsListAdaptor(
+							context, R.layout.dialog_comments_list_item, comments);
+					listView.setAdapter(adaptor);
+				} else {
+					TextView noComments = (TextView) CommentActivity.this
+							.findViewById(R.id.no_comments);
+					noComments.setVisibility(View.VISIBLE);
+				}
 			}
 		}
 	}

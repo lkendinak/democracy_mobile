@@ -1,17 +1,18 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:padding="5dp" >
 
     <TextView
         android:id="@+id/empty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:gravity="center"
-        android:text="@string/comments"
         android:layout_marginLeft="5dp"
         android:layout_marginTop="5dp"
+        android:gravity="center"
+        android:text="@string/comments"
         android:textAppearance="@android:style/TextAppearance.Medium"
         android:textColor="@color/main_purple"
         android:textStyle="bold" />
@@ -20,8 +21,8 @@
         android:id="@+id/relative"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_alignParentBottom="true" >
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal" >
 
         <!-- empty view -->
 
@@ -29,28 +30,52 @@
             android:id="@+id/new_comment"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:singleLine="true"
-            android:hint="@string/new_comment_hint"
             android:layout_alignParentLeft="true"
+            android:layout_weight="1"
+            android:hint="@string/new_comment_hint"
+            android:singleLine="true"
             android:visibility="visible" />
-        
-         <ImageButton
+
+        <ImageButton
             android:id="@+id/send_comment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
+            android:layout_gravity="center_vertical"
             android:background="@android:color/transparent"
-            android:contentDescription="Smalllogo"
+            android:contentDescription="@string/default_content"
             android:scaleType="fitXY"
-            android:src="@drawable/ic_action_send" />
+            android:src="@drawable/ic_action_send_now" />
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/no_comments"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/relative"
+        android:layout_below="@id/empty"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:scrollHorizontally="false"
+        android:singleLine="false"
+        android:text="@string/no_comments"
+        android:visibility="gone" />
+
+    <ProgressBar
+        android:id="@+id/comment_progressbar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@id/relative"
+        android:layout_below="@id/empty" />
+    
     <ListView
         android:id="@+id/listview_comments"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_above="@id/relative"
+        android:visibility="gone"
         android:layout_below="@id/empty"
         android:drawSelectorOnTop="false" />
 
