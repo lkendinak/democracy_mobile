@@ -17,6 +17,9 @@
     <string name="login">Login</string>
     
     <string name="available_questions">Perguntas disponíveis</string>
+    <string name="answer_hint">Resposta</string>
+    
+    <string name="no_discursive_answers">Você ainda não respondeu a esta pergunta.</string>
     
     <string name="comments">Comentários</string>
     <string name="no_comments">Esta pergunta ainda não possui comentários.</string>
@@ -25,6 +28,7 @@
     <string name="but_comment">Comentar</string>
     
     <string name="but_answer">Responder</string>
+    
     <string name="but_partial_result">Resultado parcial</string>
     <string name="partial_results">Total de respostas:</string>
 </resources>

@@ -8,6 +8,11 @@ public class PartialResultsDTO {
 	private Integer total;
 	
 	private ArrayList<AnswerOutputDTO> answers;
+	
+	private Integer type;
+	
+	private ArrayList<DiscursiveAnswerOutputDTO> discursiveAnswers;
+
 
 	public Integer getTotal() {
 		return total;
@@ -23,6 +28,23 @@ public class PartialResultsDTO {
 
 	public void setAnswers(ArrayList<AnswerOutputDTO> answers) {
 		this.answers = answers;
+	}
+
+	public Integer getType() {
+		return type;
+	}
+
+	public void setType(Integer type) {
+		this.type = type;
+	}
+
+	public ArrayList<DiscursiveAnswerOutputDTO> getDiscursiveAnswers() {
+		return discursiveAnswers;
+	}
+
+	public void setDiscursiveAnswers(
+			ArrayList<DiscursiveAnswerOutputDTO> discursiveAnswers) {
+		this.discursiveAnswers = discursiveAnswers;
 	}
 	
 }

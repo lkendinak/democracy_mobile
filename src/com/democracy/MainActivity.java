@@ -8,6 +8,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.TreeSet;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -24,7 +25,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -36,6 +39,7 @@ import android.widget.Toast;
 import com.democracy.dto.AnswerOutputDTO;
 import com.democracy.dto.PartialResultsDTO;
 import com.democracy.dto.QuestionAvailableOutputDTO;
+import com.democracy.enums.QuestionTypeEnum;
 import com.democracy.helper.ConnectionHelper;
 import com.democracy.helper.Constants;
 import com.google.gson.Gson;
@@ -52,6 +56,17 @@ public class MainActivity extends AppCompatActivity {
 	
 	private Integer total = -1;
 
+	static class ViewHolder {
+		TextView questionId;
+		TextView toptext;
+		TextView userDiscursiveAnswer;
+		EditText userDiscursiveAnswerEdit;
+		RadioGroup optionRadioGroup;
+		Button answerBut;
+		ImageButton partialBut;
+		ImageButton commentsBut;
+    }
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -158,22 +173,37 @@ public class MainActivity extends AppCompatActivity {
 				spinner.setVisibility(View.GONE);
 				
 				// Create adapter
-				AvailableQuestionsListAdaptor adaptor = new AvailableQuestionsListAdaptor(
-						context, R.layout.question_list_item, questions);
-				listview.setAdapter(adaptor);
+				AvailableQuestionsListAdaptor mAdapter = new AvailableQuestionsListAdaptor();
+		        for (QuestionAvailableOutputDTO question : questions) {
+		        	if(question.getTypeInt().equals(QuestionTypeEnum.MULTIPLE_CHOICES.id())) {
+		        		 mAdapter.addItem(question);
+		        	} else {
+		        		 mAdapter.addSeparatorItem(question);
+		        	}
+		        }
+		       
+				listview.setAdapter(mAdapter);
 			}
 		}
 
 	}
 
 	class AvailableQuestionsListAdaptor extends
-			ArrayAdapter<QuestionAvailableOutputDTO> {
+			BaseAdapter {
 
+		private static final int TYPE_MULTIPLE = 0;
+		
+        private static final int TYPE_DISCURSIVE = 1;
+		
 		boolean isFirstRun = true;
 		
-		private ArrayList<QuestionAvailableOutputDTO> questions;
+		private ArrayList<QuestionAvailableOutputDTO> questions = new ArrayList<QuestionAvailableOutputDTO>();
 
 		private Context context;
+		
+		private LayoutInflater mInflater;
+		
+		private TreeSet mSeparatorsSet = new TreeSet();
 		
 		@SuppressLint("UseSparseArrays")
 		private HashMap<Integer, String> answersIds = new HashMap<Integer, String>();
@@ -182,72 +212,187 @@ public class MainActivity extends AppCompatActivity {
 		
 		private int countAnswers = 0;
 
-		public AvailableQuestionsListAdaptor(Context context,
-				int textViewResourceId,
-				ArrayList<QuestionAvailableOutputDTO> items) {
-			super(context, textViewResourceId, items);
-			this.questions = items;
-			this.context = context;
-			this.allAnswers = countAllAnswers(items);
+		public AvailableQuestionsListAdaptor() {
+			this.mInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			//this.allAnswers = countAllAnswers(items);
 		}
 
+		public void addItem(final QuestionAvailableOutputDTO item) {
+            questions.add(item);
+            this.allAnswers += item.getAnswers().size();
+        }
+		
+		public void addSeparatorItem(final QuestionAvailableOutputDTO item) {
+            questions.add(item);
+            this.allAnswers++;
+            // save separator position
+            mSeparatorsSet.add(questions.size() - 1);
+        }
+		
+		@Override
+        public int getViewTypeCount() {
+            return 2;
+        }
+	 
+		@Override
+        public int getItemViewType(int position) {
+            return mSeparatorsSet.contains(position) ? TYPE_DISCURSIVE : TYPE_MULTIPLE;
+        }
+		
+        @Override
+        public int getCount() {
+            return questions.size();
+        }
+	 
+        @Override
+        public QuestionAvailableOutputDTO getItem(int position) {
+            return questions.get(position);
+        }
+ 
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+		
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 
-			View v = convertView;
-			if (v == null) {
-				LayoutInflater vi = (LayoutInflater) getApplication()
-						.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-				v = vi.inflate(R.layout.question_list_item, null);
+			ViewHolder holder;
+			int type = getItemViewType(position);
+			
+			if (convertView == null) {
+				
+				convertView = mInflater.inflate(R.layout.question_list_item, null);
+				
+				holder = new ViewHolder();
+				switch (type) {
+	                case TYPE_MULTIPLE:
+	                    convertView = mInflater.inflate(R.layout.question_list_item, null);
+	                    holder.toptext = (TextView) convertView.findViewById(R.id.toptext);
+	    				holder.questionId = (TextView) convertView.findViewById(R.id.questionId);
+	    				holder.optionRadioGroup = (RadioGroup) convertView.findViewById(R.id.optionRadioGroup);
+	    				holder.answerBut = (Button) convertView.findViewById(R.id.answer_but);
+	    				holder.partialBut = (ImageButton) convertView.findViewById(R.id.partial_but);
+	    				holder.commentsBut = (ImageButton) convertView.findViewById(R.id.comments_but);
+	    				
+	                    break;
+	                case TYPE_DISCURSIVE:
+	                    convertView = mInflater.inflate(R.layout.discursive_question_list_item, null);
+	                    holder.toptext = (TextView) convertView.findViewById(R.id.toptext);
+	    				holder.questionId = (TextView) convertView.findViewById(R.id.questionId);
+	    				holder.userDiscursiveAnswer = (TextView) convertView.findViewById(R.id.userDiscursiveAnswer);
+	    				holder.userDiscursiveAnswerEdit = (EditText) convertView.findViewById(R.id.userDiscursiveAnswerEdit);
+	    				holder.answerBut = (Button) convertView.findViewById(R.id.answer_but);
+	    				holder.partialBut = (ImageButton) convertView.findViewById(R.id.partial_but);
+	    				holder.commentsBut = (ImageButton) convertView.findViewById(R.id.comments_but);
+	                    
+	    				break;
+	            }
+				
+				convertView.setTag(holder);
+			} else {
+				holder = (ViewHolder) convertView.getTag();
 			}
 
-			if(countAnswers < allAnswers) {
-				
+			if(countAnswers < allAnswers) {				
 				QuestionAvailableOutputDTO question = questions.get(position);
-				TextView tt = (TextView) v.findViewById(R.id.toptext);
-				tt.setText(question.getQuestion());
-
-				TextView questionIdTextView = (TextView) v.findViewById(R.id.questionId);
-				questionIdTextView.setText(question.getId());
 				
-				RadioGroup rgroup = (RadioGroup) v
-						.findViewById(R.id.optionRadioGroup);
-				
-				Button answerBut = (Button) v.findViewById(R.id.answer_but);
-				answerBut.setOnClickListener(new View.OnClickListener() {
+				holder.toptext.setText(question.getQuestion());
+	
+				holder.questionId.setText(question.getId());
 					
-					@Override
-					public void onClick(View v) {
-						View parent = (View) v.getParent();
-						if(parent != null) {
-							
-							RadioGroup radioGroup = (RadioGroup) parent
-									.findViewById(R.id.optionRadioGroup);
-							
-							int selectedId = radioGroup.getCheckedRadioButtonId();
-
-							if(selectedId != -1) {
-					            // find the radiobutton by returned id
-					            RadioButton selectedRB = (RadioButton) findViewById(selectedId);
-					            
-					            String answerId = answersIds.get(selectedRB.getId());    
-					            
-								String questionId = ((TextView) parent
-									.findViewById(R.id.questionId)).getText()
-									.toString();
+				if(question.getTypeInt().equals(QuestionTypeEnum.MULTIPLE_CHOICES.id())) {
+					// Questao de multipla escolha
+					holder.optionRadioGroup.setVisibility(View.VISIBLE);
+					holder.answerBut.setOnClickListener(new View.OnClickListener() {
+						
+						@Override
+						public void onClick(View v) {
+							View parent = (View) v.getParent();
+							if(parent != null) {
 								
-								AnswerQuestionsTask answerTask = new AnswerQuestionsTask(
-										context, questionId, answerId);
-								answerTask.execute();
-							} else {
-								Toast.makeText(context, "Escolha uma opção.", Toast.LENGTH_LONG).show();
+								RadioGroup radioGroup = (RadioGroup) parent
+										.findViewById(R.id.optionRadioGroup);
+								
+								int selectedId = radioGroup.getCheckedRadioButtonId();
+	
+								if(selectedId != -1) {
+						            // find the radiobutton by returned id
+						            RadioButton selectedRB = (RadioButton) findViewById(selectedId);
+						            
+						            String answerId = answersIds.get(selectedRB.getId());    
+						            
+									String questionId = ((TextView) parent
+										.findViewById(R.id.questionId)).getText()
+										.toString();
+									
+									AnswerQuestionsTask answerTask = new AnswerQuestionsTask(
+											mContext, questionId, answerId);
+									answerTask.execute();
+								} else {
+									Toast.makeText(context, "Escolha uma opção.", Toast.LENGTH_LONG).show();
+								}
 							}
 						}
+					});
+					
+					for (AnswerOutputDTO answer : question.getAnswers()) {
+						
+						RadioButton rb = new RadioButton(convertView.getContext());
+						rb.setText(answer.getAnswer());
+						rb.setId(countAnswers);
+						answersIds.put(countAnswers, answer.getId());
+						
+						rb.setTextColor(getResources().getColor(R.color.main_purple));
+						holder.optionRadioGroup.addView(rb);
+						
+						if (question.getUserAnswer() != null
+								&& question.getUserAnswer().equals(answer.getId())) {
+							rb.setChecked(true);
+						}
+		
+						countAnswers++;
 					}
-				});
-				
-				ImageButton commentsBut = (ImageButton) v.findViewById(R.id.comments_but);
-				commentsBut.setOnClickListener(new View.OnClickListener() {
+					
+				} else {
+					
+					if (question.getUserDiscursiveAnswer() != null) {
+						// Ja respondeu esta pergunta discursiva
+						holder.userDiscursiveAnswer.setVisibility(View.VISIBLE);
+						holder.userDiscursiveAnswer.setText(question
+								.getUserDiscursiveAnswer());
+						holder.answerBut.setVisibility(View.GONE);
+					} else {
+						holder.userDiscursiveAnswerEdit.setVisibility(View.VISIBLE);
+	
+						holder.answerBut
+								.setOnClickListener(new View.OnClickListener() {
+	
+									@Override
+									public void onClick(View v) {
+										View parent = (View) v.getParent();
+										if (parent != null) {
+	
+											String discursiveAnswer = ((EditText) parent
+													.findViewById(R.id.userDiscursiveAnswerEdit))
+													.getText().toString();
+	
+											String questionId = ((TextView) parent
+													.findViewById(R.id.questionId))
+													.getText().toString();
+	
+											DiscursiveAnswerQuestionsTask answerTask = new DiscursiveAnswerQuestionsTask(
+													mContext, questionId,
+													discursiveAnswer);
+											answerTask.execute();
+										}
+									}
+								});
+					}
+					countAnswers++;
+				}
+					
+				holder.commentsBut.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
 						View parent = (View) v.getParent().getParent();
@@ -262,10 +407,8 @@ public class MainActivity extends AppCompatActivity {
 						}
 					}
 				});
-				
-				ImageButton partialBut = (ImageButton) v
-						.findViewById(R.id.partial_but);
-				partialBut.setOnClickListener(new View.OnClickListener() {
+					
+				holder.partialBut.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
 						
@@ -277,30 +420,15 @@ public class MainActivity extends AppCompatActivity {
 									.toString();
 							
 							PartialResultsTask partialResultsTask = new PartialResultsTask(
-									context, questionId);
+									mContext, questionId);
 							partialResultsTask.execute();
 						}
 					}
 				});
-				
-				for (AnswerOutputDTO answer : question.getAnswers()) {
-					RadioButton rb = new RadioButton(v.getContext());
-					rb.setText(answer.getAnswer());
-					rb.setId(countAnswers);
-					answersIds.put(countAnswers, answer.getId());
-					rb.setTextColor(getResources().getColor(R.color.main_purple));
-					rgroup.addView(rb);
-					if (question.getUserAnswer() != null
-							&& question.getUserAnswer().equals(answer.getId())) {
-						rb.setChecked(true);
-					}
-	
-					countAnswers++;
-				}
-				return v;
+			
+				return convertView;
 			}
-
-			return v;
+			return convertView;
 		}
 
 	}
@@ -310,7 +438,11 @@ public class MainActivity extends AppCompatActivity {
 		int finalCount = 0;
 		if(questions != null) {
 			for(QuestionAvailableOutputDTO question : questions) {
-				finalCount += question.getAnswers().size();
+				if(question.getAnswers() != null) {
+					finalCount += question.getAnswers().size();
+				} else {
+					finalCount++;
+				}
 			}
 			
 			return finalCount;
@@ -394,6 +526,81 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	
+	class DiscursiveAnswerQuestionsTask extends AsyncTask<String, String, String> {
+
+		private Context context;
+
+		private String questionId;
+
+		private String answer;
+
+		public DiscursiveAnswerQuestionsTask(Context context, String questionId,
+				String answer) {
+			this.context = context;
+			this.questionId = questionId;
+			this.answer = answer;
+		}
+
+		@Override
+		protected void onPreExecute() {
+			ConnectionHelper.checkInternetConnection(context);
+		}
+
+		@Override
+		protected String doInBackground(String... arg0) {
+
+			InputStream inputStream = null;
+			String result = null;
+			try {
+				String url = Constants.SERVER_URL
+						+ Constants.URL_ANSWER_DISCURSIVE_QUESTION;
+
+				SharedPreferences prefs = context.getSharedPreferences(
+						"com.democracy", Context.MODE_PRIVATE);
+				String token = prefs.getString(Constants.TOKEN_SP_KEY, null);
+
+				HashMap<String, String> postDataParams = new HashMap<String, String>();
+				postDataParams.put("questionId", this.questionId);
+				postDataParams.put("answer", this.answer);
+				postDataParams.put("token", token);
+
+				HttpURLConnection conn = ConnectionHelper.getConnectionPost(url,
+						"POST");
+
+				OutputStream os = conn.getOutputStream();
+				BufferedWriter writer = new BufferedWriter(
+						new OutputStreamWriter(os, "UTF-8"));
+				writer.write(ConnectionHelper.getPostDataString(postDataParams));
+
+				writer.flush();
+				writer.close();
+				os.close();
+
+				int statusCode = conn.getResponseCode();
+
+				/* 200 represents HTTP OK */
+				if (statusCode == 200) {
+					inputStream = new BufferedInputStream(conn.getInputStream());
+					result = ConnectionHelper
+							.convertInputStreamToString(inputStream);
+				} else {
+					result = null; // "Failed to fetch data!";
+				}
+
+				return result;
+			} catch (Exception e) {
+				return new String("Exception: " + e.getMessage());
+			}
+		}
+
+		@Override
+		protected void onPostExecute(String result) {
+			Toast.makeText(context, "Pergunta discursiva respondida.", Toast.LENGTH_LONG).show();
+		}
+
+	}
+
+	
 	
 	class PartialResultsTask extends AsyncTask<String, String, String> {
 
@@ -408,7 +615,7 @@ public class MainActivity extends AppCompatActivity {
 
 		@Override
 		protected void onPreExecute() {
-			ConnectionHelper.checkInternetConnection(context);
+			//ConnectionHelper.checkInternetConnection(context);
 		}
 
 		@Override
@@ -466,22 +673,50 @@ public class MainActivity extends AppCompatActivity {
 				builder.setTitle(R.string.but_partial_result);
 				builder.setNegativeButton(R.string.ok, null);
 				LayoutInflater inflater = getLayoutInflater();
-				View dialogView = inflater.inflate(R.layout.dialog_partial_results, null);
+				
+				if (partialResults.getType().equals(
+						QuestionTypeEnum.MULTIPLE_CHOICES.id())) {
 
-				builder.setView(dialogView);
-				TextView tvPartialResults = (TextView) dialogView.findViewById(R.id.all_answers);
-				tvPartialResults.setText(partialResults.getTotal().toString());
-				total = partialResults.getTotal();
-				
-				ListView dialogListView = (ListView) dialogView
-						.findViewById(R.id.listview_partial_results);
-				AppCompatDialog dialog = builder.create();
-				dialog.show();
-				
-				// Create partial adapter
-				AnswersListAdaptor adaptor = new AnswersListAdaptor(
-						context, R.layout.dialog_partial_list_item, partialResults.getAnswers());
-				dialogListView.setAdapter(adaptor);
+					View dialogView = inflater.inflate(
+							R.layout.dialog_partial_results, null);
+
+					builder.setView(dialogView);
+					TextView tvPartialResults = (TextView) dialogView
+							.findViewById(R.id.all_answers);
+					tvPartialResults.setText(partialResults.getTotal()
+							.toString());
+					total = partialResults.getTotal();
+
+					ListView dialogListView = (ListView) dialogView
+							.findViewById(R.id.listview_partial_results);
+					AppCompatDialog dialog = builder.create();
+					dialog.show();
+
+					// Create partial adapter
+					AnswersListAdaptor adaptor = new AnswersListAdaptor(
+							context, R.layout.dialog_partial_list_item,
+							partialResults.getAnswers());
+					dialogListView.setAdapter(adaptor);
+				} else {
+					View dialogView = inflater.inflate(
+							R.layout.dialog_partial_results_discursive, null);
+					builder.setView(dialogView);
+
+					TextView tvDiscursiveAnswer = (TextView) dialogView
+							.findViewById(R.id.discursiveAnswerText);
+
+					if (partialResults.getDiscursiveAnswers() != null
+							&& partialResults.getDiscursiveAnswers().size() > 0) {
+						tvDiscursiveAnswer.setText(partialResults
+								.getDiscursiveAnswers().get(0).getAnswer());
+					} else {
+						tvDiscursiveAnswer
+								.setText(R.string.no_discursive_answers);
+					}
+
+					AppCompatDialog dialog = builder.create();
+					dialog.show();
+				}
 			}
 		}
 	}

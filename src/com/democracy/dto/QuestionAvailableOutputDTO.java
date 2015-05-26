@@ -9,10 +9,14 @@ public class QuestionAvailableOutputDTO {
 	private String question;
 
 	private String dateActivated;
+	
+	private Integer typeInt;
 
 	private ArrayList<AnswerOutputDTO> answers;
 
 	private String userAnswer;
+	
+	private String userDiscursiveAnswer;
 
 	private Integer numComments;
 
@@ -30,6 +34,14 @@ public class QuestionAvailableOutputDTO {
 
 	public void setQuestion(String question) {
 		this.question = question;
+	}
+	
+	public Integer getTypeInt() {
+		return typeInt;
+	}
+
+	public void setTypeInt(Integer typeInt) {
+		this.typeInt = typeInt;
 	}
 
 	public String getDateActivated() {
@@ -62,6 +74,14 @@ public class QuestionAvailableOutputDTO {
 
 	public void setNumComments(Integer numComments) {
 		this.numComments = numComments;
+	}
+
+	public String getUserDiscursiveAnswer() {
+		return userDiscursiveAnswer;
+	}
+
+	public void setUserDiscursiveAnswer(String userDiscursiveAnswer) {
+		this.userDiscursiveAnswer = userDiscursiveAnswer;
 	}
 
 }

@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="5dp"
-    android:background="@color/light_blue"
+    android:background="@drawable/banner"
     android:orientation="vertical" >
 
     <ImageView
@@ -12,7 +12,7 @@
         android:layout_marginTop="70dp"
         android:layout_gravity="center_horizontal"
         android:contentDescription="@string/default_content"
-        android:src="@drawable/login_logo" />
+        android:src="@drawable/democracy_med" />
 
     <EditText
         android:id="@+id/email_field"
@@ -20,6 +20,8 @@
         android:layout_height="wrap_content"
         android:hint="@string/email_hint"
         android:layout_marginTop="30dp"
+        android:textColor="@android:color/white"
+        android:textColorHint="@android:color/white"
         android:inputType="textEmailAddress" />
 
     <EditText
@@ -27,6 +29,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/password_hint"
+        android:textColor="@android:color/white"
+        android:textColorHint="@android:color/white"
         android:inputType="textWebPassword" />
 
     <Button

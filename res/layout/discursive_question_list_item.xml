@@ -57,13 +57,22 @@
         </LinearLayout>
     </LinearLayout>
 
-    <RadioGroup
-        android:id="@+id/optionRadioGroup"
+    <TextView
+        android:id="@+id/userDiscursiveAnswer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:visibility="gone"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
-    </RadioGroup>
-
+        android:singleLine="false" 
+        android:scrollHorizontally="false" />
+        
+    <EditText
+        android:id="@+id/userDiscursiveAnswerEdit"
+        android:layout_width="match_parent" 
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:hint="@string/answer_hint"
+        android:singleLine="false" />
+    
     <Button
         android:id="@+id/answer_but"
         android:layout_width="match_parent"
